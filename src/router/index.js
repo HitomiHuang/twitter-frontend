@@ -41,6 +41,12 @@ const routes = [
     beforeEnter: authorizeIsUser
   },
   {
+    path: '/notifications',
+    name: 'notifications',
+    component: () => import('../views/Notifications.vue'),
+    beforeEnter: authorizeIsUser
+  },
+  {
     path: '/tweets/:id',
     name: 'tweet',
     component: () => import('../views/Tweet.vue'),

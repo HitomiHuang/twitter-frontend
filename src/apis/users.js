@@ -2,27 +2,27 @@ import { apiHelper } from './../utility/helpers'
 const getToken = () => localStorage.getItem('token')
 
 export default {
-  getUser({id}) {
+  getUser({ id }) {
     return apiHelper.get(`/api/users/${id}`, {
-      headers: {Authorization: `Bearer ${getToken()}`}
+      headers: { Authorization: `Bearer ${getToken()}` }
     })
   },
-  getUserTweets({id}) {
+  getUserTweets({ id }) {
     return apiHelper.get(`/api/users/${id}/tweets`, {
-      headers: {Authorization: `Bearer ${getToken()}`}
+      headers: { Authorization: `Bearer ${getToken()}` }
     })
   },
-  getUserRepliedTweets({id}) {
+  getUserRepliedTweets({ id }) {
     return apiHelper.get(`/api/users/${id}/replied_tweets`, {
-      headers: {Authorization: `Bearer ${getToken()}`}
+      headers: { Authorization: `Bearer ${getToken()}` }
     })
   },
-  getUserLikes({id}) {
+  getUserLikes({ id }) {
     return apiHelper.get(`/api/users/${id}/likes`, {
-      headers: {Authorization: `Bearer ${getToken()}`}
+      headers: { Authorization: `Bearer ${getToken()}` }
     })
   },
-  editUser({id, data}) {
+  editUser({ id, data }) {
     return apiHelper.put(`/api/users/${id}`, data, {
       headers: { Authorization: `Bearer ${getToken()}` }
     })
@@ -32,8 +32,8 @@ export default {
       headers: { Authorization: `Bearer ${getToken()}` }
     })
   },
-  addFollowing({id}) {
-    return apiHelper.post('/api/followships',{id},{
+  addFollowing({ id }) {
+    return apiHelper.post('/api/followships', { id }, {
       headers: { Authorization: `Bearer ${getToken()}` }
     })
   },
@@ -52,4 +52,12 @@ export default {
       headers: { Authorization: `Bearer ${getToken()}` }
     })
   },
+  toggleFollowingNotification({ followingId, notificationEnabled }) {
+    return apiHelper.put(`/api/followships/${followingId}/notification`,
+      { notificationEnabled },
+      {
+        headers: { Authorization: `Bearer ${getToken()}` }
+      }
+    )
+  }
 }

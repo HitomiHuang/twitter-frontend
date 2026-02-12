@@ -20,6 +20,64 @@
       <router-link class="navLinkText" to="/main"> 首頁 </router-link>
     </div>
     <div class="navLinkGroup">
+      <div class="notificationIconWrapper">
+        <svg
+          class="navLinkIcon"
+          v-if="$route.path === '/notifications'"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M18 8C18 6.4087 17.3679 4.88258 16.2426 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.88258 2.63214 7.75736 3.75736C6.63214 4.88258 6 6.4087 6 8C6 15 3 17 3 17H21C21 17 18 15 18 8Z"
+            fill="#FF6600"
+            stroke="#FF6600"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M13.73 21C13.5542 21.3031 13.3019 21.5547 12.9982 21.7295C12.6946 21.9044 12.3504 21.9965 12 21.9965C11.6496 21.9965 11.3054 21.9044 11.0018 21.7295C10.6982 21.5547 10.4458 21.3031 10.27 21"
+            fill="#FF6600"
+            stroke="#FF6600"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <svg
+          class="navLinkIcon"
+          v-else
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M18 8C18 6.4087 17.3679 4.88258 16.2426 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.88258 2.63214 7.75736 3.75736C6.63214 4.88258 6 6.4087 6 8C6 15 3 17 3 17H21C21 17 18 15 18 8Z"
+            stroke="#44444F"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M13.73 21C13.5542 21.3031 13.3019 21.5547 12.9982 21.7295C12.6946 21.9044 12.3504 21.9965 12 21.9965C11.6496 21.9965 11.3054 21.9044 11.0018 21.7295C10.6982 21.5547 10.4458 21.3031 10.27 21"
+            stroke="#44444F"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <span v-if="unreadCount > 0" class="notificationBadge">{{
+          unreadCount > 99 ? "99+" : unreadCount
+        }}</span>
+      </div>
+      <router-link class="navLinkText" to="/notifications"> 通知 </router-link>
+    </div>
+    <div class="navLinkGroup">
       <img
         class="navLinkIcon"
         src="../assets/selfInfo-active.png"
@@ -108,7 +166,7 @@
 
 <script>
 import { Toast } from "../utility/helpers";
-import tweetsAPI from '../apis/tweets'
+import tweetsAPI from "../apis/tweets";
 import { mapState } from "vuex";
 import { emptyImageFilter } from "../utility/mixins";
 
@@ -123,7 +181,16 @@ export default {
     };
   },
   computed: {
-    ...mapState(['currentUser'])
+    ...mapState(["currentUser", "unreadNotificationCount"]),
+    unreadCount() {
+      console.log("🔔 Navbar - 未讀通知數:", this.unreadNotificationCount);
+      return this.unreadNotificationCount;
+    },
+  },
+  watch: {
+    unreadNotificationCount(newVal, oldVal) {
+      console.log("📢 Navbar - 未讀數量變化:", oldVal, "->", newVal);
+    },
   },
   methods: {
     openPostTweetModal() {
@@ -140,27 +207,27 @@ export default {
       try {
         if (!this.tweetText.trim()) {
           this.postTweetModalErrorMessage = "內容不可留白";
-          this.tweetText = ''
+          this.tweetText = "";
           return;
-        }else if (this.tweetText.length > 140) {
-          return
+        } else if (this.tweetText.length > 140) {
+          return;
         }
 
-        this.isProcessing = true
+        this.isProcessing = true;
 
-        await tweetsAPI.postTweet({description: this.tweetText})
+        await tweetsAPI.postTweet({ description: this.tweetText });
 
         this.tweetText = "";
         this.postTweetModalIsOpen = false;
 
         Toast.fire({
-          icon: 'success',
-          title: '推文成功'
-        })
-        this.isProcessing = false
-        this.$router.go(0)
+          icon: "success",
+          title: "推文成功",
+        });
+        this.isProcessing = false;
+        this.$router.go(0);
       } catch (error) {
-        this.isProcessing = false
+        this.isProcessing = false;
         Toast.fire({
           icon: "error",
           title: "推文失敗",
@@ -202,6 +269,30 @@ export default {
 
 .navLinkIcon {
   margin-right: 17px;
+}
+
+.notificationIconWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.notificationBadge {
+  position: absolute;
+  top: -5px;
+  right: 10px;
+  background-color: #ff6600;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .navLinkText {

@@ -18,11 +18,25 @@
       <router-link class="mailBorder" to="/#">
         <img class="mail" src="../assets/mail.png" alt="" />
       </router-link>
-      <div class="bellBorder" v-if="false">
-        <img class="bell" src="../assets/bell.png" alt="" />
+      <div
+        class="bellBorder"
+        v-if="currentUser.isFollowed && !currentUser.notificationEnabled"
+        @click.stop.prevent="toggleNotification"
+        :style="{ cursor: isProcessing ? 'not-allowed' : 'pointer' }"
+      >
+        <img class="bell" src="../assets/bell.png" alt="開啟通知" />
       </div>
-      <div class="bellActiveBorder" v-else>
-        <img class="bellActive" src="../assets/bell-active.png" alt="" />
+      <div
+        class="bellActiveBorder"
+        v-else-if="currentUser.isFollowed && currentUser.notificationEnabled"
+        @click.stop.prevent="toggleNotification"
+        :style="{ cursor: isProcessing ? 'not-allowed' : 'pointer' }"
+      >
+        <img
+          class="bellActive"
+          src="../assets/bell-active.png"
+          alt="關閉通知"
+        />
       </div>
       <button
         :disabled="isProcessing"
@@ -96,6 +110,7 @@ export default {
         await usersAPI.addFollowing({ id });
 
         this.currentUser.isFollowed = true;
+        this.currentUser.notificationEnabled = true;
 
         Toast.fire({
           icon: "success",
@@ -116,6 +131,7 @@ export default {
         await usersAPI.deleteFollowing({ id });
 
         this.currentUser.isFollowed = false;
+        this.currentUser.notificationEnabled = false;
 
         Toast.fire({
           icon: "success",
@@ -128,6 +144,34 @@ export default {
           icon: "error",
           title: "取消跟隨失敗",
         });
+      }
+    },
+    async toggleNotification() {
+      if (this.isProcessing) return;
+
+      try {
+        this.isProcessing = true;
+        const newStatus = !this.currentUser.notificationEnabled;
+
+        await usersAPI.toggleFollowingNotification({
+          followingId: this.currentUser.id,
+          notificationEnabled: newStatus,
+        });
+
+        this.currentUser.notificationEnabled = newStatus;
+
+        Toast.fire({
+          icon: "success",
+          title: newStatus ? "已開啟通知" : "已關閉通知",
+        });
+        this.isProcessing = false;
+      } catch (error) {
+        this.isProcessing = false;
+        Toast.fire({
+          icon: "error",
+          title: "無法更新通知設定",
+        });
+        console.error(error);
       }
     },
   },

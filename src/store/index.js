@@ -21,6 +21,7 @@ export default new Vuex.Store({
     },
     isAuthenticated: false,
     token: '',
+    unreadNotificationCount: 0,
   },
   getters: {
   },
@@ -34,7 +35,7 @@ export default new Vuex.Store({
           ...currentUser
         }
         state.isAuthenticated = true
-      } catch(error) {
+      } catch (error) {
         this.commit('revokeAuthentication')
       }
     },
@@ -45,8 +46,21 @@ export default new Vuex.Store({
       state.currentUser = {}
       state.isAuthenticated = false
       state.token = ''
+      state.unreadNotificationCount = 0
       localStorage.removeItem('token')
       router.push('/signin')
+    },
+    incrementUnreadCount(state) {
+      console.log('➕ Store mutation: incrementUnreadCount', state.unreadNotificationCount, '->', state.unreadNotificationCount + 1);
+      state.unreadNotificationCount++
+    },
+    setUnreadCount(state, count) {
+      console.log('📝 Store mutation: setUnreadCount ->', count);
+      state.unreadNotificationCount = count
+    },
+    clearUnreadCount(state) {
+      console.log('🧹 Store mutation: clearUnreadCount');
+      state.unreadNotificationCount = 0
     }
   },
   actions: {
