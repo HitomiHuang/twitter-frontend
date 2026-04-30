@@ -163,6 +163,24 @@ const routes = [
     component: () => import('../views/Setting.vue')
   },
   {
+    path: '/chat/public',
+    name: 'public-chat',
+    component: () => import('../views/PublicChat.vue'),
+    beforeEnter: authorizeIsUser
+  },
+  {
+    path: '/chat/private',
+    name: 'private-messages',
+    component: () => import('../views/PrivateMessages.vue'),
+    beforeEnter: authorizeIsUser
+  },
+  {
+    path: '/chat/private/:id',
+    name: 'private-chat',
+    component: () => import('../views/PrivateMessages.vue'),
+    beforeEnter: authorizeIsUser
+  },
+  {
     path: '*',
     name: 'not-found',
     component: NotFound
