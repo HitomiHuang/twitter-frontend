@@ -25,8 +25,6 @@ class NotificationSocketHandler {
       return;
     }
 
-    console.log("👤 連接 socket 並設定通知監聽，用戶ID:", userId);
-
     // 連接 socket
     socketService.connect(userId);
 
@@ -41,7 +39,6 @@ class NotificationSocketHandler {
    * 斷開 socket 連接
    */
   disconnect() {
-    console.log("👋 斷開 socket 連接");
     socketService.disconnect();
   }
 
@@ -50,7 +47,6 @@ class NotificationSocketHandler {
    */
   setupNotificationListener() {
     socketService.onNotification((notification) => {
-      console.log("🔔 收到新通知:", notification);
 
       // 增加未讀通知數量
       if (this.store) {
@@ -73,17 +69,10 @@ class NotificationSocketHandler {
    */
   async fetchUnreadCount() {
     try {
-      console.log("🔍 開始載入未讀通知數量...");
       const { data } = await notificationsAPI.getUnreadCount();
-      console.log("✅ API 回應:", data);
-      console.log("📊 未讀數量:", data.count);
 
       if (this.store) {
         this.store.commit("setUnreadCount", data.count || 0);
-        console.log(
-          "💾 Store 已更新，當前未讀數:",
-          this.store.state.unreadNotificationCount
-        );
       }
     } catch (error) {
       console.error("❌ 無法取得未讀通知數量:", error);
