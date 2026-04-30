@@ -401,4 +401,39 @@ li {
   font-weight: 400;
   cursor: pointer;
 }
+
+/* ── Tablet (≤ 1399px) ── */
+@media (max-width: 1399px) {
+  #Navbar {
+    margin-left: 0;
+  }
+  #PopularUsers {
+    display: none;
+  }
+  .UserFollowingsMain {
+    margin-left: 68px;
+    width: calc(100% - 68px);
+    max-width: 900px;
+  }
+}
+
+/* ── Mobile (≤ 767px) ── */
+@media (max-width: 767px) {
+  #Navbar {
+    margin-left: 0;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+  }
+  #PopularUsers {
+    display: none;
+  }
+  .UserFollowingsMain {
+    margin-left: 0;
+    width: 100%;
+    padding-bottom: 70px;
+  }
+}
 </style>

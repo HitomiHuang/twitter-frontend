@@ -37,23 +37,21 @@
         </div>
       </div>
     </div>
-    <PopularUsers id="PopularUsers" />
   </div>
 </template>
 
 <script>
 import Navbar from "../components/Navbar.vue";
-import PopularUsers from "../components/PopularUsers.vue";
 import notificationsAPI from "../apis/notifications";
 import { Toast } from "../utility/helpers";
 import { mapState } from "vuex";
-import moment from "moment";
+import { fromNowFilter, notificationTextMixin } from "../utility/mixins";
 
 export default {
   components: {
     Navbar,
-    PopularUsers,
   },
+  mixins: [fromNowFilter, notificationTextMixin],
   data() {
     return {
       notifications: [],
@@ -61,11 +59,6 @@ export default {
   },
   computed: {
     ...mapState(["currentUser"]),
-  },
-  filters: {
-    fromNow(datetime) {
-      return datetime ? moment(datetime).fromNow() : "-";
-    },
   },
   methods: {
     async fetchNotifications() {
@@ -79,15 +72,6 @@ export default {
           title: "無法取得通知",
         });
       }
-    },
-    getNotificationText(type) {
-      const typeMap = {
-        new_tweet: "發布了新推文",
-        new_follower: "開始追蹤你",
-        new_reply: "回覆了你的推文",
-        new_like: "喜歡你的推文",
-      };
-      return typeMap[type] || "";
     },
     async handleNotificationClick(notification) {
       try {
@@ -225,5 +209,40 @@ export default {
   font-size: 14px;
   color: #6c757d;
   margin-top: 4px;
+}
+
+/* ── Tablet (≤ 1399px) ── */
+@media (max-width: 1399px) {
+  #Navbar {
+    margin-left: 0;
+  }
+  #PopularUsers {
+    display: none;
+  }
+  .notificationsSection {
+    margin-left: 68px;
+    width: calc(100% - 68px);
+    max-width: 900px;
+  }
+}
+
+/* ── Mobile (≤ 767px) ── */
+@media (max-width: 767px) {
+  #Navbar {
+    margin-left: 0;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+  }
+  #PopularUsers {
+    display: none;
+  }
+  .notificationsSection {
+    margin-left: 0;
+    width: 100%;
+    padding-bottom: 70px;
+  }
 }
 </style>

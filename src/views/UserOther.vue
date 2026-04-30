@@ -1,7 +1,8 @@
 <template>
   <div class="UserSelfContainer">
-    <Navbar id="Navbar" />
-    <div v-show="currentUser.name" class="UserSelfMain">
+    <div class="mainRow">
+      <Navbar id="Navbar" />
+      <div v-show="currentUser.name" class="UserSelfMain">
       <div class="userTitle">
         <router-link to="/main">
           <img class="backIcon" src="../assets/Vector.png" alt="" />
@@ -25,6 +26,7 @@
         v-if="$route.name == 'user-other' && $route.params.type == 'likes'"
         :initialCurrentTweets="userLikes"
       />
+      </div>
     </div>
     <PopularUsers id="PopularUsers" />
   </div>
@@ -88,7 +90,9 @@ export default {
         const responseUserComments = await usersAPI.getUserRepliedTweets({
           id,
         });
-        this.userComments = responseUserComments.data.filter((item) => item.Tweet !== null );
+        this.userComments = responseUserComments.data.filter(
+          (item) => item.Tweet !== null
+        );
 
         const responseUserLikes = await usersAPI.getUserLikes({
           id,
@@ -120,6 +124,10 @@ export default {
 .UserSelfContainer {
   width: 100%;
   display: grid;
+}
+
+.mainRow {
+  display: contents;
 }
 
 #Navbar {
@@ -178,6 +186,59 @@ export default {
   font-size: 13px;
   line-height: 19px;
   color: #6c757d;
+}
+
+/* ── Tablet (≤ 1399px) ── */
+@media (max-width: 1399px) {
+  .mainRow {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    max-width: 968px;
+    margin: 0 auto;
+  }
+  #Navbar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    align-self: flex-start;
+    flex-shrink: 0;
+    margin-left: 0;
+  }
+  #PopularUsers {
+    display: none;
+  }
+  .UserSelfMain {
+    flex: 1;
+    max-width: 900px;
+    margin-left: 0;
+    width: auto;
+  }
+}
+
+/* ── Mobile (≤ 767px) ── */
+@media (max-width: 767px) {
+  .mainRow {
+    display: contents;
+  }
+  #Navbar {
+    position: fixed;
+    margin-left: 0;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 65px;
+  }
+  #PopularUsers {
+    display: none;
+  }
+  .UserSelfMain {
+    margin-left: 0;
+    width: 100%;
+    padding-bottom: 70px;
+  }
 }
 </style>
 

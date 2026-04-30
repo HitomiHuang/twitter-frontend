@@ -15,7 +15,7 @@
       alt=""
     />
     <div class="buttons">
-      <router-link class="mailBorder" to="/#">
+      <router-link class="mailBorder" :to="{ name: 'private-chat', params: { id: currentUser.id } }">
         <img class="mail" src="../assets/mail.png" alt="" />
       </router-link>
       <div

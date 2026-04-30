@@ -94,4 +94,32 @@ export default {
 .adminTweetsTable {
   width: 100%;
 }
+
+/* ── Tablet (≤ 1399px) ── */
+@media (max-width: 1399px) {
+  #AdminNavbar {
+    margin-left: 0;
+  }
+  .adminTweetsSection {
+    margin-left: 68px;
+    width: calc(100% - 68px);
+  }
+}
+
+/* ── Mobile (≤ 767px) ── */
+@media (max-width: 767px) {
+  #AdminNavbar {
+    margin-left: 0;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+  }
+  .adminTweetsSection {
+    margin-left: 0;
+    width: 100%;
+    padding-bottom: 70px;
+  }
+}
 </style>

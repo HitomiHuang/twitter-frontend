@@ -154,14 +154,14 @@ export default {
 
         this.isProcessing = true;
 
-        const {data} = await usersAPI.editUser({
+        const { data } = await usersAPI.editUser({
           id: this.currentUser.id,
           data: {
             account: this.account,
             name: this.name,
             email: this.email,
             password: this.password,
-            checkPassword: this.passwordCheck
+            checkPassword: this.passwordCheck,
           },
         });
 
@@ -169,7 +169,6 @@ export default {
 
         this.$store.commit("setCurrentUser", data.token);
         this.$store.commit("setToken");
-
 
         Toast.fire({
           icon: "success",
@@ -309,5 +308,40 @@ export default {
 
 .settingFormSubmitBtn:disabled:hover {
   cursor: wait;
+}
+
+/* ── Tablet (≤ 1399px) ── */
+@media (max-width: 1399px) {
+  #Navbar {
+    margin-left: 0;
+  }
+  .settingSection {
+    margin-left: 68px;
+    width: calc(100% - 68px);
+  }
+}
+
+/* ── Mobile (≤ 767px) ── */
+@media (max-width: 767px) {
+  #Navbar {
+    margin-left: 0;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+  }
+  .settingSection {
+    margin-left: 0;
+    width: 100%;
+    padding-bottom: 70px;
+  }
+  .labelInputGroup {
+    width: 100%;
+  }
+  .settingFormSubmitBtn {
+    margin-left: auto;
+    display: block;
+  }
 }
 </style>

@@ -9,10 +9,7 @@
             <p>推文</p>
           </router-link>
         </div>
-        <TweetDetail
-          id="TweetDetail"
-          :initialTweet="tweet"
-        />
+        <TweetDetail id="TweetDetail" :initialTweet="tweet" />
         <Comments id="TweetComments" :currentRepliedTweets="tweetReplies" />
       </div>
     </div>
@@ -67,23 +64,25 @@ export default {
     async fetchData(id) {
       try {
         const tweetInfoResponse = await tweetsAPI.getTweet({
-          id
+          id,
         });
 
         this.tweet = tweetInfoResponse.data;
 
         const tweetRepliesResponse = await tweetsAPI.getTweetReplies({
-          id
+          id,
         });
 
         this.tweetReplies = tweetRepliesResponse.data;
         this.tweetReplies = this.tweetReplies.map((item) => {
           item = {
             ...item,
-            userAvatar: item.userAvatar ? item.userAvatar : 'https://d29fhpw069ctt2.cloudfront.net/icon/image/84587/preview.svg'
-          }
-          return item
-        })
+            userAvatar: item.userAvatar
+              ? item.userAvatar
+              : "https://d29fhpw069ctt2.cloudfront.net/icon/image/84587/preview.svg",
+          };
+          return item;
+        });
       } catch (error) {
         Toast.fire({
           icon: "error",
@@ -155,5 +154,40 @@ export default {
 }
 
 .TweetDetail {
+}
+
+/* ── Tablet (≤ 1399px) ── */
+@media (max-width: 1399px) {
+  #Navbar {
+    margin-left: 0;
+  }
+  #PopularUsers {
+    display: none;
+  }
+  .tweetSection {
+    margin-left: 68px;
+    width: calc(100% - 68px);
+    max-width: 900px;
+  }
+}
+
+/* ── Mobile (≤ 767px) ── */
+@media (max-width: 767px) {
+  #Navbar {
+    margin-left: 0;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+  }
+  #PopularUsers {
+    display: none;
+  }
+  .tweetSection {
+    margin-left: 0;
+    width: 100%;
+    padding-bottom: 70px;
+  }
 }
 </style>

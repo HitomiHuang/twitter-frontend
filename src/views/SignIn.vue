@@ -51,9 +51,19 @@
         登入
       </button>
       <div class="linkGroup">
-        <router-link :is="isProcessing ? 'span' : 'router-link'" class="link" to="/signup">註冊</router-link>
+        <router-link
+          :is="isProcessing ? 'span' : 'router-link'"
+          class="link"
+          to="/signup"
+          >註冊</router-link
+        >
         •
-        <router-link :is="isProcessing ? 'span' : 'router-link'" class="link" to="/admin/signin">後台登入</router-link>
+        <router-link
+          :is="isProcessing ? 'span' : 'router-link'"
+          class="link"
+          to="/admin/signin"
+          >後台登入</router-link
+        >
       </div>
     </form>
   </div>
@@ -265,5 +275,18 @@ form {
 .link {
   text-decoration: underline;
   color: #0062ff;
+}
+
+/* ── Mobile (≤ 480px) ── */
+@media (max-width: 480px) {
+  .SignIn {
+    padding-top: 40px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  form {
+    width: 100%;
+    max-width: 356px;
+  }
 }
 </style>

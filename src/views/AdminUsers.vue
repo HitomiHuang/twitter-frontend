@@ -16,38 +16,37 @@
 
 <script>
 import AdminNavbar from "../components/AdminNavbar.vue";
-import AdminUser from '../components/AdminUser.vue'
-import adminAPI from '../apis/admin'
+import AdminUser from "../components/AdminUser.vue";
+import adminAPI from "../apis/admin";
 import { Toast } from "../utility/helpers";
 
 export default {
   components: {
     AdminNavbar,
-    AdminUser
+    AdminUser,
   },
   data() {
     return {
       users: [],
-    }
+    };
   },
   methods: {
     async fetchData() {
       try {
-        const {data} = await adminAPI.getUsers()
+        const { data } = await adminAPI.getUsers();
 
-        this.users = data
-      }
-      catch(error) {
+        this.users = data;
+      } catch (error) {
         Toast.fire({
-          icon: 'error',
-          title: '無法取得使用者列表'
-        })
+          icon: "error",
+          title: "無法取得使用者列表",
+        });
       }
-    }
+    },
   },
   created() {
-    this.fetchData()
-  }
+    this.fetchData();
+  },
 };
 </script>
 
@@ -77,7 +76,7 @@ export default {
 .adminUsersTitle {
   width: 100%;
   height: 74px;
-  border-bottom: 1px solid #E6ECF0;
+  border-bottom: 1px solid #e6ecf0;
   padding: 24px 23px;
   font-size: 24px;
   font-weight: 700;
@@ -92,4 +91,38 @@ export default {
   grid-gap: 16px;
 }
 
+/* ── Tablet (≤ 1399px) ── */
+@media (max-width: 1399px) {
+  #AdminNavbar {
+    margin-left: 0;
+  }
+  .adminUsersSection {
+    margin-left: 68px;
+    width: calc(100% - 68px);
+  }
+  .adminUsersTable {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+/* ── Mobile (≤ 767px) ── */
+@media (max-width: 767px) {
+  #AdminNavbar {
+    margin-left: 0;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+  }
+  .adminUsersSection {
+    margin-left: 0;
+    width: 100%;
+    padding-bottom: 70px;
+  }
+  .adminUsersTable {
+    grid-template-columns: 1fr 1fr;
+    padding: 12px 8px;
+  }
+}
 </style>

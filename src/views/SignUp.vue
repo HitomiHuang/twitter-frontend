@@ -355,4 +355,17 @@ form {
 .cancelBtn:disabled:hover {
   cursor: wait;
 }
+
+/* ── Mobile (≤ 480px) ── */
+@media (max-width: 480px) {
+  .SignUp {
+    padding-top: 40px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  form {
+    width: 100%;
+    max-width: 356px;
+  }
+}
 </style>

@@ -1,13 +1,15 @@
 <template>
   <div class="Main">
-    <Navbar id="Navbar" />
-    <div class="mainSection">
-      <div class="mainSectionContent">
-        <div class="mainTitle">
-          <h1>首頁</h1>
+    <div class="mainRow">
+      <Navbar id="Navbar" />
+      <div class="mainSection">
+        <div class="mainSectionContent">
+          <div class="mainTitle">
+            <h1>首頁</h1>
+          </div>
+          <MainPostTweet :currentUser="currentUser" />
+          <AllTweets :initialCurrentTweets="currentTweets" />
         </div>
-        <MainPostTweet :currentUser="currentUser" />
-        <AllTweets :initialCurrentTweets="currentTweets" />
       </div>
     </div>
     <PopularUsers id="PopularUsers" />
@@ -21,7 +23,7 @@ import AllTweets from "../components/AllTweets.vue";
 import PopularUsers from "../components/PopularUsers.vue";
 import { mapState } from "vuex";
 import tweetsAPI from "../apis/tweets";
-import { Toast } from '../utility/helpers';
+import { Toast } from "../utility/helpers";
 
 export default {
   components: {
@@ -41,14 +43,14 @@ export default {
   methods: {
     async fetchData() {
       try {
-        const {data} = await tweetsAPI.getTweets();
+        const { data } = await tweetsAPI.getTweets();
 
-        this.currentTweets = data
+        this.currentTweets = data;
       } catch (error) {
         Toast.fire({
-          icon: 'error',
-          title: '推文取得失敗'
-        })
+          icon: "error",
+          title: "推文取得失敗",
+        });
       }
     },
   },
@@ -62,6 +64,10 @@ export default {
 .Main {
   width: 100%;
   display: grid;
+}
+
+.mainRow {
+  display: contents;
 }
 
 #Navbar {
@@ -97,5 +103,58 @@ export default {
   font-size: 24px;
   font-weight: 700;
   color: #1c1c1c;
+}
+
+/* ── Tablet (≤ 1399px) ── */
+@media (max-width: 1399px) {
+  .mainRow {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    max-width: 968px;
+    margin: 0 auto;
+  }
+  #Navbar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    align-self: flex-start;
+    flex-shrink: 0;
+    margin-left: 0;
+  }
+  #PopularUsers {
+    display: none;
+  }
+  .mainSection {
+    flex: 1;
+    max-width: 900px;
+    margin-left: 0;
+    width: auto;
+  }
+}
+
+/* ── Mobile (≤ 767px) ── */
+@media (max-width: 767px) {
+  .mainRow {
+    display: contents;
+  }
+  #Navbar {
+    position: fixed;
+    margin-left: 0;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 65px;
+  }
+  #PopularUsers {
+    display: none;
+  }
+  .mainSection {
+    margin-left: 0;
+    width: 100%;
+    padding-bottom: 70px;
+  }
 }
 </style>

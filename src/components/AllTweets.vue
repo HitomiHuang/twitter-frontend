@@ -162,8 +162,11 @@
 import { Toast } from "../utility/helpers";
 import tweetsAPI from "../apis/tweets";
 import { mapState } from "vuex";
-import { fromNowFilter } from "../utility/mixins";
-import { emptyImageFilter } from "../utility/mixins";
+import {
+  fromNowFilter,
+  emptyImageFilter,
+  replyTweetModalMixin,
+} from "../utility/mixins";
 
 export default {
   props: {
@@ -172,128 +175,11 @@ export default {
       required: true,
     },
   },
-  mixins: [fromNowFilter, emptyImageFilter],
-  data() {
-    return {
-      replyTweetModalIsOpen: false,
-      replyTweetModalTweetInfo: {
-        id: -1,
-        UserId: -1,
-        description: "",
-        createdAt: "",
-        updatedAt: "",
-        Likes: -1,
-        Replies: -1,
-        User: {
-          id: -1,
-          email: "",
-          password: "",
-          name: "",
-          role: "",
-          account: "",
-          cover: "",
-          avatar: "",
-          introduction: "",
-          createdAt: "",
-          updatedAt: "",
-        },
-        isLiked: false,
-      },
-      replyText: "",
-      isProcessing: false,
-    };
-  },
+  mixins: [fromNowFilter, emptyImageFilter, replyTweetModalMixin],
   computed: {
     ...mapState(["currentUser"]),
   },
   methods: {
-    async openReplyTweetModal(id) {
-      try {
-        this.isProcessing = true;
-        const { data } = await tweetsAPI.getTweet({ id });
-
-        this.replyTweetModalTweetInfo = data;
-
-        this.replyTweetModalIsOpen = true;
-        this.isProcessing = false;
-      } catch (error) {
-        this.isProcessing = false;
-        Toast.fire({
-          icon: "error",
-          title: "推文資料取得失敗",
-        });
-      }
-    },
-    closeReplyTweetModal() {
-      this.isProcessing = true;
-      this.replyTweetModalTweetInfo = {
-        id: -1,
-        UserId: -1,
-        description: "",
-        createdAt: "",
-        updatedAt: "",
-        Likes: -1,
-        Replies: -1,
-        User: {
-          id: -1,
-          email: "",
-          password: "",
-          name: "",
-          role: "",
-          account: "",
-          cover: "",
-          avatar: "",
-          introduction: "",
-          createdAt: "",
-          updatedAt: "",
-        },
-        isLiked: false,
-      };
-      this.replyTweetModalIsOpen = false;
-      this.replyText = "";
-      this.isProcessing = false;
-    },
-    async replyTweetModalSubmit() {
-      try {
-        if (!this.replyText.trim()) {
-          Toast.fire({
-            icon: "warning",
-            title: "回覆內容不可留白",
-          });
-          this.replyText = "";
-          return;
-        } else if (this.replyText.length > 140) {
-          Toast.fire({
-            icon: "warning",
-            title: "回覆內容不可超過140字",
-          });
-          return;
-        }
-
-        this.isProcessing = true;
-
-        await tweetsAPI.replyTweet({
-          id: this.replyTweetModalTweetInfo.id,
-          comment: this.replyText,
-        });
-
-        Toast.fire({
-          icon: "success",
-          title: "回覆推文成功",
-        });
-
-        this.replyText = "";
-        this.replyTweetModalIsOpen = false;
-        this.isProcessing = false;
-        this.$router.go(0);
-      } catch (error) {
-        this.isProcessing = false;
-        Toast.fire({
-          icon: "error",
-          title: "回復推文失敗",
-        });
-      }
-    },
     async addLike(id) {
       try {
         this.isProcessing = true;

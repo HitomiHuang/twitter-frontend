@@ -2,17 +2,19 @@
   <div class="PopularUsers">
     <h1 class="popularUsersTitle">跟隨誰</h1>
     <div class="popularUser" v-for="user in popularUsers" :key="user.id">
-      <router-link :to="{ name: 'user-other', params: { id: user.id , type: 'tweets' } }">
+      <router-link
+        :to="{ name: 'user-other', params: { id: user.id, type: 'tweets' } }"
+      >
         <img :src="user.avatar | emptyImage" class="popularUsersImage" alt="" />
       </router-link>
       <div class="popularUsersNameGroup">
         <router-link
-          :to="{ name: 'user-other', params: { id: user.id , type: 'tweets' } }"
+          :to="{ name: 'user-other', params: { id: user.id, type: 'tweets' } }"
           class="popularUsersName"
           >{{ user | nameIsTooLong }}</router-link
         >
         <router-link
-          :to="{ name: 'user-other', params: { id: user.id , type: 'tweets' } }"
+          :to="{ name: 'user-other', params: { id: user.id, type: 'tweets' } }"
           class="popularUsersAccount"
           >@{{ user | accountIsTooLong }}</router-link
         >
@@ -55,7 +57,9 @@ export default {
       try {
         const { data } = await usersAPI.getTopUsers();
         this.popularUsers = data;
-        this.popularUsers = this.popularUsers.filter((item) => item.id !== this.$store.state.currentUser.id).slice(0, 8)
+        this.popularUsers = this.popularUsers
+          .filter((item) => item.id !== this.$store.state.currentUser.id)
+          .slice(0, 8);
       } catch (error) {
         Toast.fire({
           icon: "error",
@@ -232,5 +236,12 @@ export default {
 .popularUsersFollowedBtn:disabled:hover,
 .popularUsersFollowBtn:disabled:hover {
   cursor: wait;
+}
+
+/* ── 響應式：平板以下隱藏 ── */
+@media (max-width: 1399px) {
+  .PopularUsers {
+    display: none;
+  }
 }
 </style>
