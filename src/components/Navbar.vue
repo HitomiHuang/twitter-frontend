@@ -77,6 +77,72 @@
       </div>
       <router-link class="navLinkText" to="/notifications"> 通知 </router-link>
     </div>
+    <!-- 公開聊天室 -->
+    <div class="navLinkGroup">
+      <div class="notificationIconWrapper">
+        <svg
+          class="navLinkIcon"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z"
+            :stroke="
+              $route.path.startsWith('/chat/public') ? '#FF6600' : '#44444F'
+            "
+            :fill="$route.path.startsWith('/chat/public') ? '#FF6600' : 'none'"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+      <router-link class="navLinkText" to="/chat/public">
+        公開聊天室
+      </router-link>
+    </div>
+    <!-- 私人訊息 -->
+    <div class="navLinkGroup">
+      <div class="notificationIconWrapper">
+        <svg
+          class="navLinkIcon"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z"
+            :stroke="
+              $route.path.startsWith('/chat/private') ? '#FF6600' : '#44444F'
+            "
+            :fill="$route.path.startsWith('/chat/private') ? '#FF6600' : 'none'"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <polyline
+            points="22,6 12,13 2,6"
+            :stroke="
+              $route.path.startsWith('/chat/private') ? 'white' : '#44444F'
+            "
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <span v-if="unreadPrivateCount > 0" class="notificationBadge">{{
+          unreadPrivateCount > 99 ? "99+" : unreadPrivateCount
+        }}</span>
+      </div>
+      <router-link class="navLinkText" to="/chat/private">
+        私人訊息
+      </router-link>
+    </div>
     <div class="navLinkGroup">
       <img
         class="navLinkIcon"
@@ -181,10 +247,17 @@ export default {
     };
   },
   computed: {
-    ...mapState(["currentUser", "unreadNotificationCount"]),
+    ...mapState([
+      "currentUser",
+      "unreadNotificationCount",
+      "unreadPrivateMessageCount",
+    ]),
     unreadCount() {
       console.log("🔔 Navbar - 未讀通知數:", this.unreadNotificationCount);
       return this.unreadNotificationCount;
+    },
+    unreadPrivateCount() {
+      return this.unreadPrivateMessageCount;
     },
   },
   watch: {
@@ -444,5 +517,131 @@ export default {
 .navLogoutLinkGroup {
   position: absolute;
   bottom: 0px;
+}
+
+/* ── Tablet (≤ 1399px): icon-only sidebar ── */
+@media (max-width: 1399px) {
+  .Navbar {
+    width: 68px;
+  }
+  .navLinkGroup {
+    position: relative;
+    padding-left: 0;
+    justify-content: center;
+  }
+  .navLinkText {
+    position: absolute;
+    inset: 0;
+    font-size: 0;
+  }
+  .navLinkIcon {
+    margin-right: 0;
+  }
+  .notificationIconWrapper {
+    margin: 0 auto;
+  }
+  .openPostTweetModalBtn {
+    width: 46px;
+    height: 46px;
+    font-size: 0;
+    border-radius: 50%;
+    margin: 8px auto;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .openPostTweetModalBtn::after {
+    content: "✎";
+    font-size: 20px;
+    color: white;
+  }
+  .navLogoutBtn {
+    display: none;
+  }
+  .navLogoutLinkGroup {
+    justify-content: center;
+    padding-left: 0;
+  }
+}
+
+/* ── Mobile (≤ 767px): fixed bottom horizontal bar ── */
+@media (max-width: 767px) {
+  .Navbar {
+    width: 100%;
+    height: 58px;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid #e6ecf0;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+    overflow: visible;
+  }
+  .navbarLogo {
+    display: none;
+  }
+  .navLinkGroup {
+    position: relative;
+    height: 100%;
+    padding: 0 6px;
+    width: auto;
+    min-width: 36px;
+    justify-content: center;
+    align-items: center;
+  }
+  .navLinkText {
+    position: absolute;
+    inset: 0;
+    font-size: 0;
+  }
+  .navLinkIcon {
+    margin-right: 0;
+    width: 24px;
+    height: 24px;
+  }
+  .notificationIconWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .openPostTweetModalBtn {
+    width: 44px;
+    height: 44px;
+    font-size: 0;
+    border-radius: 50%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .openPostTweetModalBtn::after {
+    content: "✎";
+    font-size: 20px;
+    color: white;
+  }
+  .navLogoutLinkGroup {
+    position: static;
+    justify-content: center;
+    padding-left: 0;
+  }
+  .navLogoutBtn {
+    display: none;
+  }
+  /* PostTweet Modal: bottom sheet on mobile */
+  #postTweetModal {
+    align-items: flex-end;
+  }
+  #postTweetModalWrapper {
+    width: 100%;
+    height: auto;
+    max-height: 85vh;
+    border-radius: 14px 14px 0 0;
+    margin-top: 0;
+  }
+  .postTweetModalText {
+    width: 100%;
+  }
 }
 </style>
