@@ -58,6 +58,9 @@
                 alt=""
               />
               <div class="messageBody">
+                <span class="senderName">{{
+                  item.sender && item.sender.name
+                }}</span>
                 <div class="bubbleContent otherBubble">{{ item.content }}</div>
                 <span class="messageTime">{{
                   formatTime(item.createdAt)
@@ -364,6 +367,14 @@ export default {
   background-color: #f0f0f0;
   color: #0f1419;
   border-bottom-left-radius: 4px;
+}
+
+.senderName {
+  font-size: 12px;
+  font-weight: 700;
+  color: #657786;
+  margin-bottom: 3px;
+  padding-left: 4px;
 }
 
 .messageTime {
