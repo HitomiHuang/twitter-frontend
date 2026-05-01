@@ -3,12 +3,20 @@
     <div class="mainRow">
       <Navbar id="Navbar" />
       <div class="mainSection">
-        <div class="mainSectionContent">
+        <div class="sticky-header">
           <div class="mainTitle">
             <h1>首頁</h1>
           </div>
           <MainPostTweet :currentUser="currentUser" />
+        </div>
+        <div ref="scrollContainer" class="mainSectionContent">
           <AllTweets :initialCurrentTweets="currentTweets" />
+          <div ref="sentinel" class="sentinel">
+            <span v-if="isLoading" class="loading-text">載入中...</span>
+            <span v-else-if="!hasMore" class="no-more-text"
+              >沒有更多推文了</span
+            >
+          </div>
         </div>
       </div>
     </div>
@@ -25,6 +33,8 @@ import { mapState } from "vuex";
 import tweetsAPI from "../apis/tweets";
 import { Toast } from "../utility/helpers";
 
+const TWEETS_PER_PAGE = 10;
+
 export default {
   components: {
     Navbar,
@@ -35,27 +45,72 @@ export default {
   data() {
     return {
       currentTweets: [],
+      offset: 0,
+      isLoading: false,
+      hasMore: true,
+      observer: null,
     };
   },
   computed: {
     ...mapState(["currentUser", "token"]),
   },
   methods: {
-    async fetchData() {
+    async fetchTweets(offset) {
+      if (this.isLoading || !this.hasMore) return;
+      this.isLoading = true;
       try {
-        const { data } = await tweetsAPI.getTweets();
-
-        this.currentTweets = data;
+        const { data } = await tweetsAPI.getTweets({
+          limit: TWEETS_PER_PAGE,
+          offset,
+        });
+        if (offset === 0) {
+          this.currentTweets = data;
+        } else {
+          this.currentTweets = [...this.currentTweets, ...data];
+        }
+        this.offset = offset + data.length;
+        if (data.length < TWEETS_PER_PAGE) {
+          this.hasMore = false;
+        }
       } catch (error) {
         Toast.fire({
           icon: "error",
           title: "推文取得失敗",
         });
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    setupObserver() {
+      if (this.observer) {
+        this.observer.disconnect();
+      }
+      this.observer = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && this.hasMore && !this.isLoading) {
+            this.fetchTweets(this.offset);
+          }
+        },
+        { root: this.$refs.scrollContainer, rootMargin: "200px" }
+      );
+      if (this.$refs.sentinel) {
+        this.observer.observe(this.$refs.sentinel);
       }
     },
   },
-  created() {
-    this.fetchData();
+  mounted() {
+    // observer 在首次資料載入後才設定，避免 race condition
+  },
+  beforeDestroy() {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
+  },
+  async created() {
+    await this.fetchTweets(0);
+    this.$nextTick(() => {
+      this.setupObserver();
+    });
   },
 };
 </script>
@@ -64,6 +119,8 @@ export default {
 .Main {
   width: 100%;
   display: grid;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .mainRow {
@@ -74,7 +131,6 @@ export default {
   justify-self: start;
   position: fixed;
   margin-left: 130px;
-  /* width: 178px; */
 }
 
 #PopularUsers {
@@ -82,17 +138,27 @@ export default {
   justify-self: end;
   margin-right: 130px;
   margin-top: 16px;
-  /* width: 273px; */
 }
 
 .mainSection {
   width: 640px;
   margin-left: 332px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid #e6ecf0;
+  border-right: 1px solid #e6ecf0;
 }
 
 .mainSectionContent {
-  border-left: 1px solid #e6ecf0;
-  border-right: 1px solid #e6ecf0;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.sticky-header {
+  background: #fff;
+  flex-shrink: 0;
 }
 
 .mainTitle {
@@ -103,6 +169,19 @@ export default {
   font-size: 24px;
   font-weight: 700;
   color: #1c1c1c;
+}
+
+.sentinel {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-text,
+.no-more-text {
+  font-size: 13px;
+  color: #6c757d;
 }
 
 /* ── Tablet (≤ 1399px) ── */
@@ -121,6 +200,7 @@ export default {
     align-self: flex-start;
     flex-shrink: 0;
     margin-left: 0;
+    --bell-right-offset: max(0px, calc((100vw - 968px) / 2));
   }
   #PopularUsers {
     display: none;
@@ -128,8 +208,10 @@ export default {
   .mainSection {
     flex: 1;
     max-width: 900px;
+    min-width: 425px;
     margin-left: 0;
     width: auto;
+    height: 100vh;
   }
 }
 
@@ -154,6 +236,12 @@ export default {
   .mainSection {
     margin-left: 0;
     width: 100%;
+    height: 100vh;
+  }
+  .MainPostTweet {
+    display: none;
+  }
+  .mainSectionContent {
     padding-bottom: 70px;
   }
 }
