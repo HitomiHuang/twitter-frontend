@@ -34,7 +34,7 @@
 <script>
 import { mapState } from "vuex";
 import tweetsAPI from "../apis/tweets";
-import {Toast} from '../utility/helpers'
+import { Toast } from "../utility/helpers";
 import { emptyImageFilter } from "../utility/mixins";
 
 export default {
@@ -53,28 +53,27 @@ export default {
       try {
         if (!this.tweetText.trim()) {
           this.mainPostTweetErrorMessage = "內容不可留白";
-          this.tweetText = ''
+          this.tweetText = "";
           return;
         }
         if (this.tweetText.length > 140) {
           return;
         }
 
-        await tweetsAPI.postTweet({description: this.tweetText})
-
+        await tweetsAPI.postTweet({ description: this.tweetText });
 
         this.tweetText = "";
 
         Toast.fire({
-          icon: 'success',
-          title: '推文成功'
-        })
+          icon: "success",
+          title: "推文成功",
+        });
         this.$router.go(0);
       } catch (error) {
         Toast.fire({
-          icon: 'error',
-          title: '推文失敗'
-        })
+          icon: "error",
+          title: "推文失敗",
+        });
       }
     },
   },
