@@ -3,29 +3,43 @@
     <div class="mainRow">
       <Navbar id="Navbar" />
       <div v-show="currentUser.name" class="UserSelfMain">
-      <div class="userTitle">
-        <router-link to="/main">
-          <img class="backIcon" src="../assets/Vector.png" alt="" />
-        </router-link>
-        <div class="userInfo">
-          <h1 class="infoName">{{ currentUser.name }}</h1>
-          <span class="infoTweetsNumber">{{ userTweets.length }}則推文</span>
+        <div class="sticky-profile-header">
+          <div class="userTitle">
+            <router-link to="/main">
+              <img class="backIcon" src="../assets/Vector.png" alt="" />
+            </router-link>
+            <div class="userInfo">
+              <h1 class="infoName">{{ currentUser.name }}</h1>
+              <span class="infoTweetsNumber"
+                >{{ userTweets.length }}則推文</span
+              >
+            </div>
+          </div>
+          <UserOtherCard :initialCurrentUser="currentUser" />
+          <UserOtherTabs :currentUser="currentUser" />
         </div>
-      </div>
-      <UserOtherCard :initialCurrentUser="currentUser" />
-      <UserOtherTabs :currentUser="currentUser" />
-      <UserTweets
-        v-if="$route.name == 'user-other' && $route.params.type == 'tweets'"
-        :initialCurrentTweets="userTweets"
-      />
-      <Comments
-        v-if="$route.name == 'user-other' && $route.params.type == 'comments'"
-        :currentRepliedTweets="userComments"
-      />
-      <UserLikesTweets
-        v-if="$route.name == 'user-other' && $route.params.type == 'likes'"
-        :initialCurrentTweets="userLikes"
-      />
+        <div ref="scrollContainer" class="userContentScroll">
+          <UserTweets
+            v-if="$route.name == 'user-other' && $route.params.type == 'tweets'"
+            :initialCurrentTweets="userTweets"
+          />
+          <Comments
+            v-if="
+              $route.name == 'user-other' && $route.params.type == 'comments'
+            "
+            :currentRepliedTweets="userComments"
+          />
+          <UserLikesTweets
+            v-if="$route.name == 'user-other' && $route.params.type == 'likes'"
+            :initialCurrentTweets="userLikes"
+          />
+          <div ref="sentinel" class="sentinel">
+            <span v-if="isLoading" class="loading-text">載入中...</span>
+            <span v-else-if="!hasMoreForCurrentTab" class="no-more-text"
+              >沒有更多了</span
+            >
+          </div>
+        </div>
       </div>
     </div>
     <PopularUsers id="PopularUsers" />
@@ -42,6 +56,8 @@ import usersAPI from "../apis/users";
 import { Toast } from "../utility/helpers";
 import Comments from "../components/Comments.vue";
 import UserLikesTweets from "../components/UserLikesTweets.vue";
+
+const TWEETS_PER_PAGE = 10;
 
 export default {
   components: {
@@ -73,49 +89,173 @@ export default {
         role: "",
         updatedAt: "",
       },
+      // per-tab pagination
+      userTweetsOffset: 0,
+      userTweetsHasMore: true,
+      userCommentsOffset: 0,
+      userCommentsHasMore: true,
+      userLikesOffset: 0,
+      userLikesHasMore: true,
+      isLoading: false,
+      observer: null,
+      profileUserId: null,
     };
   },
 
+  computed: {
+    currentTab() {
+      const type = this.$route.params.type;
+      if (type === "comments") return "comments";
+      if (type === "likes") return "likes";
+      return "tweets";
+    },
+    hasMoreForCurrentTab() {
+      if (this.currentTab === "comments") return this.userCommentsHasMore;
+      if (this.currentTab === "likes") return this.userLikesHasMore;
+      return this.userTweetsHasMore;
+    },
+  },
+
   methods: {
-    async fetchData(id) {
+    resetPagination() {
+      this.userTweets = [];
+      this.userComments = [];
+      this.userLikes = [];
+      this.userTweetsOffset = 0;
+      this.userTweetsHasMore = true;
+      this.userCommentsOffset = 0;
+      this.userCommentsHasMore = true;
+      this.userLikesOffset = 0;
+      this.userLikesHasMore = true;
+    },
+    async fetchUserProfile(id) {
+      const { data } = await usersAPI.getUser({ id });
+      this.currentUser = data;
+    },
+    async loadMoreForTab(tab) {
+      if (this.isLoading) return;
+      const id = this.profileUserId;
+      this.isLoading = true;
       try {
-        const { data } = await usersAPI.getUser({ id });
-        this.currentUser = data;
-
-        const responseUserTweets = await usersAPI.getUserTweets({
-          id,
-        });
-        this.userTweets = responseUserTweets.data;
-
-        const responseUserComments = await usersAPI.getUserRepliedTweets({
-          id,
-        });
-        this.userComments = responseUserComments.data.filter(
-          (item) => item.Tweet !== null
-        );
-
-        const responseUserLikes = await usersAPI.getUserLikes({
-          id,
-        });
-        this.userLikes = responseUserLikes.data;
+        if (tab === "tweets" && this.userTweetsHasMore) {
+          const { data } = await usersAPI.getUserTweets({
+            id,
+            limit: TWEETS_PER_PAGE,
+            offset: this.userTweetsOffset,
+          });
+          this.userTweets = [...this.userTweets, ...data];
+          this.userTweetsOffset += data.length;
+          if (data.length < TWEETS_PER_PAGE) {
+            this.userTweetsHasMore = false;
+          }
+        } else if (tab === "comments" && this.userCommentsHasMore) {
+          const { data } = await usersAPI.getUserRepliedTweets({
+            id,
+            limit: TWEETS_PER_PAGE,
+            offset: this.userCommentsOffset,
+          });
+          const filtered = data.filter((item) => item.Tweet !== null);
+          this.userComments = [...this.userComments, ...filtered];
+          this.userCommentsOffset += data.length;
+          if (data.length < TWEETS_PER_PAGE) {
+            this.userCommentsHasMore = false;
+          }
+        } else if (tab === "likes" && this.userLikesHasMore) {
+          const { data } = await usersAPI.getUserLikes({
+            id,
+            limit: TWEETS_PER_PAGE,
+            offset: this.userLikesOffset,
+          });
+          this.userLikes = [...this.userLikes, ...data];
+          this.userLikesOffset += data.length;
+          if (data.length < TWEETS_PER_PAGE) {
+            this.userLikesHasMore = false;
+          }
+        }
       } catch (error) {
         Toast.fire({
           icon: "error",
-          title: "無法取得該使用者推文",
+          title: "無法取得資料",
         });
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    setupObserver() {
+      if (this.observer) {
+        this.observer.disconnect();
+      }
+      this.observer = new IntersectionObserver(
+        (entries) => {
+          if (
+            entries[0].isIntersecting &&
+            this.hasMoreForCurrentTab &&
+            !this.isLoading
+          ) {
+            this.loadMoreForTab(this.currentTab);
+          }
+        },
+        { root: this.$refs.scrollContainer, rootMargin: "200px" }
+      );
+      if (this.$refs.sentinel) {
+        this.observer.observe(this.$refs.sentinel);
       }
     },
   },
 
-  created() {
+  async created() {
     const { id } = this.$route.params;
-    this.fetchData(id);
+    this.profileUserId = id;
+    try {
+      await this.fetchUserProfile(id);
+    } catch (error) {
+      Toast.fire({ icon: "error", title: "無法取得使用者資料" });
+    }
+    await this.loadMoreForTab(this.currentTab);
+    this.$nextTick(() => {
+      this.setupObserver();
+    });
+  },
+
+  mounted() {},
+
+  beforeDestroy() {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
   },
 
   beforeRouteUpdate(to, from, next) {
-    const { id } = to.params;
-    this.fetchData(id);
-    next();
+    const toId = to.params.id;
+    const fromId = from.params.id;
+    const toType = to.params.type || "tweets";
+
+    if (toId !== fromId) {
+      // 切換到不同使用者，重置所有狀態
+      this.profileUserId = toId;
+      this.resetPagination();
+      this.fetchUserProfile(toId).catch(() => {
+        Toast.fire({ icon: "error", title: "無法取得使用者資料" });
+      });
+      next();
+      this.$nextTick(() => {
+        this.loadMoreForTab(toType);
+        this.setupObserver();
+      });
+    } else {
+      // 同使用者不同 tab
+      next();
+      this.$nextTick(() => {
+        const isEmpty =
+          (toType === "tweets" && this.userTweets.length === 0) ||
+          (toType === "comments" && this.userComments.length === 0) ||
+          (toType === "likes" && this.userLikes.length === 0);
+        if (isEmpty) {
+          this.loadMoreForTab(toType);
+        }
+        this.setupObserver();
+      });
+    }
   },
 };
 </script>
@@ -124,6 +264,8 @@ export default {
 .UserSelfContainer {
   width: 100%;
   display: grid;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .mainRow {
@@ -134,7 +276,6 @@ export default {
   justify-self: start;
   position: fixed;
   margin-left: 130px;
-  /* width: 210px; */
 }
 
 #PopularUsers {
@@ -142,7 +283,6 @@ export default {
   justify-self: end;
   margin-right: 130px;
   margin-top: 16px;
-  /* width: 350px; */
 }
 
 .UserSelfMain {
@@ -150,10 +290,21 @@ export default {
   margin-left: 332px;
   border-left: 1px solid #e6ecf0;
   border-right: 1px solid #e6ecf0;
-  /* display: flex;
+  height: 100vh;
+  display: flex;
   flex-direction: column;
-  align-items: center; */
-  /* border: 1px solid black; */
+}
+
+.userContentScroll {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.sticky-profile-header {
+  flex-shrink: 0;
+  background: #fff;
+  z-index: 10;
 }
 
 .userTitle {
@@ -188,6 +339,19 @@ export default {
   color: #6c757d;
 }
 
+.sentinel {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-text,
+.no-more-text {
+  font-size: 13px;
+  color: #6c757d;
+}
+
 /* ── Tablet (≤ 1399px) ── */
 @media (max-width: 1399px) {
   .mainRow {
@@ -204,6 +368,7 @@ export default {
     align-self: flex-start;
     flex-shrink: 0;
     margin-left: 0;
+    --bell-right-offset: max(0px, calc((100vw - 968px) / 2));
   }
   #PopularUsers {
     display: none;
@@ -213,6 +378,7 @@ export default {
     max-width: 900px;
     margin-left: 0;
     width: auto;
+    height: 100vh;
   }
 }
 
@@ -237,6 +403,9 @@ export default {
   .UserSelfMain {
     margin-left: 0;
     width: 100%;
+    height: 100vh;
+  }
+  .userContentScroll {
     padding-bottom: 70px;
   }
 }
