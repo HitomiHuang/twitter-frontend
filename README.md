@@ -1,51 +1,108 @@
-# Twitter Project
+# Twitter — 前端
 
-## 關於專案 ****About The Project****
+模擬 Twitter 核心功能的全端社群平台，前端以 Vue 2 構建，支援即時聊天與通知推播。
 
-隨著社群媒體蓬勃發展，人們交流、互動的方式越趨轉於線上，因此我們模擬相當熱門的平台Twitter，試著打造一個能供人們在線上互動的社群軟體。
+---
 
-以下是我們產品替供的主要功能：
+## 功能總覽
 
-- 能創建自己的帳號，使用該帳號發送推文、瀏覽其他人的推文，並對各個貼文按讚、留言等等
-- 能夠追蹤其他帳號，即使掌握他人的最新動態
-- 能夠個人化帳號風格，包括設定頭像、背景圖片，或是姓名等等
+### 一般使用者
 
-當然還有些小功能提供使用者慢慢探索，我們希望能藉由這個產品，讓使用者能有良好的社群互動。
+| 功能 | 說明 |
+|------|------|
+| 註冊 / 登入 | 建立帳號並以 JWT 驗證身份 |
+| 推文牆 | 瀏覽所有人的推文，支援無限捲動式列表 |
+| 發推文 | 撰寫並發布推文（字數限制 140 字） |
+| 推文互動 | 對推文按讚、留下回覆，查看回覆串 |
+| 個人頁面 | 查看自己或他人的推文、回覆、按讚列表 |
+| 追蹤系統 | 追蹤 / 取消追蹤其他使用者，查看粉絲與追蹤清單 |
+| 熱門推薦 | 側邊欄顯示追蹤人數最多的使用者排行 |
+| 帳號設定 | 修改帳號名稱、Email、密碼、頭像與封面圖片 |
+| 通知中心 | 接收被按讚、被回覆、被追蹤等即時通知，支援全部已讀與單筆刪除 |
+| 公開聊天室 | 即時廣播聊天，顯示目前上線使用者清單 |
+| 私人訊息 | 一對一私訊，支援未讀計數、訊息收回功能 |
 
-<img width="1309" alt="截圖 2022-05-22 下午5 23 55" src="https://user-images.githubusercontent.com/84775995/169688571-d98c7206-1614-4647-8233-a426727f2f26.png">
+### 管理員
 
+| 功能 | 說明 |
+|------|------|
+| 管理員登入 | 獨立的管理員帳號入口 |
+| 推文管理 | 瀏覽全站所有推文並可強制刪除 |
+| 使用者管理 | 瀏覽所有使用者資訊與推文數量統計 |
 
-## 開發工具 **Built With**
+---
 
-前端框架： Vue.js
+## 技術棧
 
-除了使用Vue外，切版部分均為手刻，沒有使用如Bootstrap開發框架，大型排版使用Grid系統，小型部分微調則是使用Flex系統或是Position定位。
+| 類別 | 套件 |
+|------|------|
+| 前端框架 | Vue 2 |
+| 狀態管理 | Vuex |
+| 路由 | Vue Router |
+| HTTP 請求 | Axios |
+| 即時通訊 | Socket.IO Client |
+| 時間處理 | Moment.js |
+| 身份驗證 | JWT Decode |
+| 提示元件 | SweetAlert2 |
 
-## ****使用步驟 Project setup****
-1. 可以使用此連結開始使用Twitter：
-https://andy888jam.github.io/twitter-front-end/#/signin     進入後，請先創建一組帳號密碼以登入，就可以使用該產品各項功能。
+版面切版全為手刻，未使用 Bootstrap 等 CSS 框架；大型排版採用 Grid，細部調整使用 Flexbox。
 
-2. 亦可以依照下列步驟安裝到本地執行：
+---
 
-### Install
-```
+## 本地安裝與啟動
+
+**環境需求：** Node.js 14+
+
+```bash
+# 安裝相依套件
 npm install
-```
 
-### Compiles and hot-reloads for development
-```
+# 開發模式（含 hot-reload）
 npm run serve
-```
 
-### Compiles and minifies for production
-```
+# 建置正式版本
 npm run build
-```
 
-### Lints and fixes files
-```
+# 程式碼檢查與修正
 npm run lint
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+> 前端預設連線至 `http://localhost:3000`，請確認後端 API 服務已啟動。
+
+---
+
+## 路由結構
+
+```
+/signin                 使用者登入
+/signup                 使用者註冊
+/main                   推文牆（首頁）
+/tweets/:id             推文詳細頁
+/user/self/:type        自己的個人頁（tweets / comments / likes）
+/user/:id/:type         他人的個人頁
+/user/:id/followings    追蹤清單
+/user/:id/followers     粉絲清單
+/setting                帳號設定
+/notifications          通知中心
+/chat/public            公開聊天室
+/chat/private           私人訊息列表
+/chat/private/:id       與指定使用者的私訊
+/admin/signin           管理員登入
+/admin/tweets           管理員 — 推文管理
+/admin/users            管理員 — 使用者管理
+```
+
+---
+
+## 目錄結構
+
+```
+src/
+├── apis/           API 呼叫模組（admin / chat / notifications / tweets / users）
+├── assets/         靜態資源
+├── components/     可複用元件
+├── router/         Vue Router 路由設定
+├── store/          Vuex 狀態管理
+├── utility/        共用工具函式與 mixins
+└── views/          頁面元件
+```
