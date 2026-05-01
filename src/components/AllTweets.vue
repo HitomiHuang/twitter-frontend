@@ -41,6 +41,12 @@
           <router-link :to="{ name: 'tweet', params: { id: tweet.id } }">{{
             tweet.description
           }}</router-link>
+          <router-link
+            v-if="tweet.description && tweet.description.length >= 50"
+            class="showMoreLink"
+            :to="{ name: 'tweet', params: { id: tweet.id } }"
+            >顯示更多</router-link
+          >
         </p>
         <div class="singleTweetBtnGroup">
           <button
@@ -286,6 +292,13 @@ export default {
   font-weight: 400;
   color: #171725;
   line-height: 26px;
+}
+
+.singleTweetText .showMoreLink {
+  display: block;
+  font-size: 14px;
+  color: #ff6600 !important;
+  margin-top: 4px;
 }
 
 .singleTweetBtnGroup {

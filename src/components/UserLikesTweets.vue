@@ -44,6 +44,14 @@
             :to="{ name: 'tweet', params: { id: tweet.Tweet.id } }"
             >{{ tweet.Tweet.description }}</router-link
           >
+          <router-link
+            v-if="
+              tweet.Tweet.description && tweet.Tweet.description.length >= 50
+            "
+            class="showMoreLink"
+            :to="{ name: 'tweet', params: { id: tweet.Tweet.id } }"
+            >顯示更多</router-link
+          >
         </p>
         <div class="singleTweetBtnGroup">
           <button
@@ -292,6 +300,13 @@ export default {
   line-height: 26px;
 }
 
+.singleTweetText .showMoreLink {
+  display: block;
+  font-size: 14px;
+  color: #ff6600 !important;
+  margin-top: 4px;
+}
+
 .singleTweetBtnGroup {
   height: 16px;
   display: flex;
@@ -496,5 +511,63 @@ export default {
   position: absolute;
   left: 48px;
   top: 139px;
+}
+
+/* ── Mobile (≤ 767px) ── */
+@media (max-width: 767px) {
+  /* 推文列表：縮減 padding，讓內容自動填滿 */
+  .singleTweet {
+    padding: 12px 16px;
+    min-height: auto;
+  }
+
+  .singleTweetContent {
+    flex: 1;
+    min-width: 0;
+    width: auto;
+  }
+
+  /* 使用者名稱列可換行，避免溢出 */
+  .singleTweetUserNameGroup {
+    flex-wrap: wrap;
+    height: auto;
+  }
+
+  /* 答覆 Modal：底部彈出樣式 */
+  #replyTweetModal {
+    align-items: flex-end;
+  }
+
+  #replyTweetModalWrapper {
+    width: 100%;
+    height: auto;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 14px 14px 0 0;
+    margin: 0;
+  }
+
+  .replyTweetModalContent {
+    height: auto;
+  }
+
+  .replyTweet {
+    height: auto;
+    padding-left: 16px;
+  }
+
+  .replyTweetText {
+    width: 100%;
+  }
+
+  .currentUserReply {
+    padding-left: 16px;
+  }
+
+  .currentUserReplyText {
+    flex: 1;
+    min-width: 0;
+    width: auto;
+  }
 }
 </style>

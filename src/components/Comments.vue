@@ -13,7 +13,7 @@
           }"
         >
           <img
-            :src="( comment.userAvatar || comment.User.avatar) | emptyImage"
+            :src="(comment.userAvatar || comment.User.avatar) | emptyImage"
             alt=""
           />
         </router-link>
@@ -194,5 +194,28 @@ export default {
 .likedNumber {
   padding: 0 0 1px 9.3px;
   color: #6c757d;
+}
+
+/* ── Mobile (≤ 767px) ── */
+@media (max-width: 767px) {
+  .comment {
+    padding: 12px 16px;
+  }
+
+  /* 讓留言內容區自動填滿剩餘空間，避免文字被截斷 */
+  .commentContent {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .commentText {
+    width: auto;
+  }
+
+  /* 使用者名稱列可換行 */
+  .commentUserNameGroup {
+    flex-wrap: wrap;
+    height: auto;
+  }
 }
 </style>

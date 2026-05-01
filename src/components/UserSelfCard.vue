@@ -28,7 +28,7 @@
             ✖
           </button>
           <p class="title">編輯個人資料</p>
-          <button :disabled="isProcessing" type="submit" class="save" >
+          <button :disabled="isProcessing" type="submit" class="save">
             儲存
           </button>
         </div>
@@ -56,7 +56,11 @@
             />
           </div>
           <div class="userImageGroup">
-            <img class="modalUserImage" :src="userEditModalAvatar | emptyImage" alt="" />
+            <img
+              class="modalUserImage"
+              :src="userEditModalAvatar | emptyImage"
+              alt=""
+            />
             <label for="modalImageInput">
               <input
                 @change="handleAvatarChange"
@@ -128,12 +132,16 @@
       <router-link
         class="userFollowingsCount"
         :to="{ name: 'user-followings', params: { id: initialCurrentUser.id } }"
-        >{{ initialCurrentUser.Followings }}&nbsp;個<span>跟隨中</span></router-link
+        >{{ initialCurrentUser.Followings }}&nbsp;個<span
+          >跟隨中</span
+        ></router-link
       >
       <router-link
         class="userFollowersCount"
         :to="{ name: 'user-followers', params: { id: initialCurrentUser.id } }"
-        >{{ initialCurrentUser.Followers }}&nbsp;個<span>跟隨者</span></router-link
+        >{{ initialCurrentUser.Followers }}&nbsp;個<span
+          >跟隨者</span
+        ></router-link
       >
     </div>
   </div>
@@ -142,8 +150,7 @@
 <script>
 import usersAPI from "../apis/users";
 import { Toast } from "../utility/helpers";
-import { emptyImageFilter
- } from "../utility/mixins";
+import { emptyImageFilter } from "../utility/mixins";
 export default {
   mixins: [emptyImageFilter],
   props: {
@@ -161,19 +168,21 @@ export default {
       userEditModalIntroduction: "",
       userEditModalCover: "",
       userEditModalAvatar: "",
-      isProcessing: false
+      isProcessing: false,
     };
   },
   methods: {
     fetchData() {
       this.userEditModalName = this.initialCurrentUser.name;
-      this.userEditModalIntroduction = this.initialCurrentUser.introduction? this.initialCurrentUser.introduction : ''
+      this.userEditModalIntroduction = this.initialCurrentUser.introduction
+        ? this.initialCurrentUser.introduction
+        : "";
       this.userEditModalCover = this.initialCurrentUser.cover;
       this.userEditModalAvatar = this.initialCurrentUser.avatar;
     },
     openUserEditModal() {
       this.userEditModalIsOpen = true;
-      this.fetchData()
+      this.fetchData();
     },
     closeUserEditModal() {
       this.postTweetModalErrorMessage = "";
@@ -193,27 +202,26 @@ export default {
           return;
         }
 
-        this.isProcessing = true
+        this.isProcessing = true;
 
-        const form = e.target
-        const formData = new FormData(form)
+        const form = e.target;
+        const formData = new FormData(form);
 
-        const {data} = await usersAPI.editUser({
+        const { data } = await usersAPI.editUser({
           id: this.initialCurrentUser.id,
           data: formData,
         });
 
-        
         localStorage.setItem("token", data.token);
 
         this.$store.commit("setCurrentUser", data.token);
         this.$store.commit("setToken");
 
         this.userEditModalIsOpen = false;
-        this.isProcessing = false
+        this.isProcessing = false;
         this.$router.go(0);
       } catch (error) {
-        this.isProcessing = false
+        this.isProcessing = false;
         Toast.fire({
           icon: "error",
           title: "無法保存使用者資訊",
@@ -575,5 +583,81 @@ span {
 #modalCoverInput,
 #modalImageInput {
   display: none;
+}
+
+/* ── Mobile (≤ 767px) ── */
+@media (max-width: 767px) {
+  /* 確保 userCard 不因子元素導致水平溢出 */
+  .userCard {
+    overflow-x: hidden;
+  }
+
+  /* 背景圖片確保 100% 寬度 */
+  .userBackgroundImage {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* 編輯個人資料按鈕：縮小 padding 與字體 */
+  .userEdit {
+    right: 12px;
+    font-size: 14px;
+    padding: 6px 12px;
+  }
+
+  /* 個人資訊區塊 */
+  .userInformation {
+    margin-top: 72px;
+  }
+
+  /* 編輯 Modal：底部彈出樣式 */
+  #userEditModal {
+    align-items: flex-end;
+    display: flex;
+  }
+
+  #userEditModalWrapper {
+    width: 100%;
+    height: 680px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 14px 14px 0 0;
+    margin: 0;
+  }
+
+  /* Header：讓 save 自動推到右邊 */
+  .title {
+    flex: 1;
+    margin-left: 12px;
+    font-size: 16px;
+  }
+
+  .save {
+    margin-left: auto;
+    margin-right: 16px;
+  }
+
+  /* 背景圖片上的相機與 X 圖示：依比例置中 */
+  .backgroundCamera {
+    left: calc(50% - 28px);
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .backgroundX {
+    left: calc(50% + 12px);
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  /* 表單欄位：流體寬度 */
+  .inputName,
+  .inputDescription {
+    width: calc(100% - 32px);
+  }
+
+  .inputName {
+    margin-top: 80px;
+  }
 }
 </style>
