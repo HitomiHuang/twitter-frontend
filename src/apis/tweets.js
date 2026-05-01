@@ -6,8 +6,8 @@ export default {
   postTweet({ description }) {
     return apiHelper.post('/api/tweets', { description }, authHeaders())
   },
-  getTweets() {
-    return apiHelper.get('/api/tweets', authHeaders())
+  getTweets({ limit = 10, offset = 0 } = {}) {
+    return apiHelper.get('/api/tweets', { ...authHeaders(), params: { limit, offset } })
   },
   getTweet({ id }) {
     return apiHelper.get(`/api/tweets/${id}`, authHeaders())

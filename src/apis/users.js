@@ -6,14 +6,14 @@ export default {
   getUser({ id }) {
     return apiHelper.get(`/api/users/${id}`, authHeaders())
   },
-  getUserTweets({ id }) {
-    return apiHelper.get(`/api/users/${id}/tweets`, authHeaders())
+  getUserTweets({ id, limit = 10, offset = 0 }) {
+    return apiHelper.get(`/api/users/${id}/tweets`, { ...authHeaders(), params: { limit, offset } })
   },
-  getUserRepliedTweets({ id }) {
-    return apiHelper.get(`/api/users/${id}/replied_tweets`, authHeaders())
+  getUserRepliedTweets({ id, limit = 10, offset = 0 }) {
+    return apiHelper.get(`/api/users/${id}/replied_tweets`, { ...authHeaders(), params: { limit, offset } })
   },
-  getUserLikes({ id }) {
-    return apiHelper.get(`/api/users/${id}/likes`, authHeaders())
+  getUserLikes({ id, limit = 10, offset = 0 }) {
+    return apiHelper.get(`/api/users/${id}/likes`, { ...authHeaders(), params: { limit, offset } })
   },
   editUser({ id, data }) {
     return apiHelper.put(`/api/users/${id}`, data, authHeaders())
